@@ -1,21 +1,61 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { Component } from 'react';
+import { ActivityIndicator, FlatList, Text, View, Image, Button, StyleSheet } from 'react-native';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+export default class App extends Component {
+    constructor(props) {
+        super(props);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+        this.state = {
+            data: [],
+            isLoading: true
+        };
+    }
+
+    componentDidMount() {
+        fetch('https://dog.ceo/api/breeds/image/random')
+            .then((response) => response.json())
+            .then((json) => {
+                this.setState({ data: json.message });
+            })
+            .catch((error) => console.error(error))
+            .finally(() => {
+                this.setState({ isLoading: false });
+            });
+    }
+
+    render() {
+        const { data } = this.state;
+
+        const styles = StyleSheet.create({
+            container: {
+                paddingTop: 175,
+                paddingBottom: 500,
+                backgroundColor: '#333'
+            },
+            titleText: {
+                fontSize: 30,
+                fontWeight: "bold",
+                color: '#f0f8ff'
+            },
+            pupImage: {
+                width: 400,
+                height: 400
+            }
+        });
+
+        return (
+            <View style={styles.container}>
+                <Text style={styles.titleText}>
+                    Your Pup for the Day
+                </Text>
+                <Image style={styles.pupImage}
+                    source={{ uri: `${data}` }}
+                />
+                <Button
+                    title="Different pup"
+                    onPress={() => this.componentDidMount()}
+                />
+            </View>
+        );
+    }
+};
